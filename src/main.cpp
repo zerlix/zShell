@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <zShell.h>
 
-
 zShell shell;
 
 void setup() {

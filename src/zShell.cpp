@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <zShell.h>
+#include <zShellCommands.h>
 
 
 /**
@@ -94,6 +95,8 @@ void zShell::parseCommand()
     doCommand();
 }
 
+
+
 /**
  * @brief checkt command und führt passende funktion aus
  **/
@@ -102,7 +105,7 @@ void zShell::doCommand()
     Serial.println();
     if (strncmp(command, "mem", 3) == 0) 
     {
-        Serial.println("mem");
+        mem();
     } 
     else 
     {
