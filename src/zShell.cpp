@@ -2,6 +2,7 @@
 #include <zShell.h>
 #include <zShellCommands.h>
 
+std::map<String, fptr> commandMap;
 
 /**
  * @brief *commands und *arguments 
@@ -24,6 +25,9 @@ zShell::zShell()
  **/
 void zShell::init()
 {
+    commandMap["mem"] = &mem;
+    commandMap["free"] = &free;
+
     Serial.write(27);
     Serial.print("[2J"); // Escape-Sequenz für das Löschen des Bildschirms
     
@@ -102,15 +106,15 @@ void zShell::parseCommand()
  **/
 void zShell::doCommand() 
 {
-    Serial.println();
-    if (strncmp(command, "mem", 3) == 0) 
-    {
-        mem();
-    } 
-    else 
-    {
-        Serial.println("Unbekannter Befehl.");
-        
+    Serial.println(command);
+    String cmd = String(command);
+    cmd.trim();
+    
+    if (commandMap.find(cmd) != commandMap.end()) {
+        commandMap[cmd](0, nullptr);
+    }
+    else {
+        Serial.println("Unbekannter Befehl");
     }
     prompt();
 }
