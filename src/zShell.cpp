@@ -18,8 +18,9 @@ zShell::zShell()
 
 void zShell::init()
 {
-    commandMap["mem"] = &mem;
     commandMap["free"] = &free;
+    commandMap["sysinfo"] = &sysinfo;
+    
 
     Serial.write(27);
     Serial.print("[2J");
