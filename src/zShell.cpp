@@ -1,61 +1,47 @@
 #include <Arduino.h>
 #include <zShell.h>
 #include <zShellCommands.h>
+#include <map>
 
 std::map<String, fptr> commandMap;
 
-/**
- * @brief *commands und *arguments 
- * auf NULL initialisieren, um sicherzustellen, dass sie nicht auf zufällige Speicherbereiche zeigen.
- **/
 zShell::zShell()
 {
-    command = NULL;
+    command = ""; // Anstatt NULL einen leeren String verwenden
     for (int i = 0; i < MAX_ARGUMENTS_LENGTH; i++)
     {
-        arguments[i] = NULL;
+        arguments[i] = "";
     }
     init();
     return; 
 }
 
-
-/**
- * @brief: init
- **/
 void zShell::init()
 {
     commandMap["mem"] = &mem;
     commandMap["free"] = &free;
 
     Serial.write(27);
-    Serial.print("[2J"); // Escape-Sequenz für das Löschen des Bildschirms
+    Serial.print("[2J");
     
     Serial.write(27);
-    Serial.print("[H");  // Escape-Sequenz für das Setzen des Cursors auf (0,0)
+    Serial.print("[H");
 
-    //Serial.print("zDisplay:~# "); // prompt ausgeben
     prompt();
     return;
 }
 
-
-
-/**
- * @brief: liest, falls vorhanden, eingabe aus dem Seriellen Buffer
- **/
 void zShell::handleSerialInput()
 {
-    if (Serial.available() > 0) // TODO: While() ????
+    if (Serial.available() > 0)
     {
-        char receivedChar = Serial.read(); // zeichen lesen
+        char receivedChar = Serial.read();
 
         if (receivedChar == '\n')
         {
-            inputBuffer[inputIndex] = '\0'; // Null-terminieren, um eine Zeichenkette zu erstellen
-            inputIndex = 0; // Zurücksetzen des Eingabe-Index
+            inputBuffer[inputIndex] = '\0';
+            inputIndex = 0;
             parseCommand();
-            //Serial.println(" ");
         }
         else
         {
@@ -64,54 +50,58 @@ void zShell::handleSerialInput()
             inputIndex++;
             if (inputIndex >= MAX_INPUT_LENGTH)
             {
-                // Pufferüberlauf verhindern
                 inputIndex = 0;
             }
         }   
     }
 }
 
-
-/**
- * @brief parse den inputBuffer (Command/Arguments)
- **/
 void zShell::parseCommand()
 {
-    char *commandToken = strtok(inputBuffer, " "); // Befehl (erstes Token)
-    
-    int argc = 0; // Anzahl der Argumente
+    String inputString(inputBuffer); // Zeichenkette aus dem Puffer erstellen
+    int spaceIndex = inputString.indexOf(' ');
 
-    // Zerlege die Zeichenkette in Tokens
-    while (commandToken != NULL)
+    if (spaceIndex >= 0)
     {
-        if (argc == 0) {
-            command = commandToken; // Das erste Token ist der Befehl
-        } else if (argc < MAX_ARGUMENTS_LENGTH) {
-            arguments[argc - 1] = commandToken; // Argumente (ignoriere das erste Token)
-        } else {
-            Serial.println("Zu viele Argumente!");
-            return;
+        // Befehl und Argumente aufteilen
+        command = inputString.substring(0, spaceIndex);
+        inputString = inputString.substring(spaceIndex + 1);
+        int argc = 0;
+
+        while (inputString.length() > 0 && argc < MAX_ARGUMENTS_LENGTH)
+        {
+            spaceIndex = inputString.indexOf(' ');
+            if (spaceIndex >= 0)
+            {
+                arguments[argc] = inputString.substring(0, spaceIndex);
+                inputString = inputString.substring(spaceIndex + 1);
+            }
+            else
+            {
+                arguments[argc] = inputString;
+                inputString = "";
+            }
+            argc++;
         }
-        argc++;
-        commandToken = strtok(NULL, " "); // Nächstes Token
+
+        doCommand();
     }
-    
-    doCommand();
+    else
+    {
+        // Nur Befehl, keine Argumente
+        command = inputString;
+        doCommand();
+    }
 }
 
-
-
-/**
- * @brief checkt command und führt passende funktion aus
- **/
 void zShell::doCommand() 
 {
-    Serial.println(command);
-    String cmd = String(command);
-    cmd.trim();
+    Serial.println();
+    command.trim();
     
-    if (commandMap.find(cmd) != commandMap.end()) {
-        commandMap[cmd](0, nullptr);
+    if (commandMap.find(command) != commandMap.end()) {
+        // Führen Sie die Befehlsfunktion mit Standardargumenten aus
+        commandMap[command](0, nullptr);
     }
     else {
         Serial.println("Unbekannter Befehl");

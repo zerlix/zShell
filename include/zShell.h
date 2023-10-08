@@ -13,8 +13,8 @@ class zShell
 {
     private:
         char inputBuffer[MAX_INPUT_LENGTH];
-        char *command;
-        char *arguments[MAX_ARGUMENTS_LENGTH];
+        String command;
+        String arguments[MAX_ARGUMENTS_LENGTH];
         int inputIndex = 0;
         
         inline void prompt(){Serial.print("zDisplay:~# "); }
