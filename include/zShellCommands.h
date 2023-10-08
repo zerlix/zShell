@@ -2,13 +2,10 @@
 #define ZSHELLCOMMANDS
 #include <Arduino.h>
 
-
 void free(int argc, char *argv)
 {
      Serial.println("Free memory: " + String(esp_get_free_heap_size()) + " bytes");
 }
-
-
 
 void sysinfo(int argc, char *argv)
 {
@@ -23,6 +20,19 @@ void sysinfo(int argc, char *argv)
      Serial.printf("This chip has %d cores\n", ESP.getChipCores());
      Serial.print("Chip ID: ");
      Serial.println(chipId);
+
+     uint32_t Freq = getCpuFrequencyMhz();
+     Serial.print("CPU Freq = ");
+     Serial.print(Freq);
+     Serial.println(" MHz");
+     Freq = getXtalFrequencyMhz();
+     Serial.print("XTAL Freq = ");
+     Serial.print(Freq);
+     Serial.println(" MHz");
+     Freq = getApbFrequency();
+     Serial.print("APB Freq = ");
+     Serial.print(Freq);
+     Serial.println(" Hz");
 }
 
 #endif
