@@ -3,7 +3,6 @@
 #include <zShellCommands.h>
 #include <map>
 
-//std::map<String, fptr> commandMap;
 
 zShell::zShell()
 {
@@ -13,18 +12,17 @@ zShell::zShell()
         arguments[i] = "";
     }
     init();
-    return; 
+    return;
 }
 
 void zShell::init()
 {
     commandMap["free"] = &free;
     commandMap["sysinfo"] = &sysinfo;
-    
 
     Serial.write(27);
     Serial.print("[2J");
-    
+
     Serial.write(27);
     Serial.print("[H");
 
@@ -34,30 +32,43 @@ void zShell::init()
 
 void zShell::handleSerialInput()
 {
+    // falls Serielle eingabe vorhanden, lesen
     if (Serial.available() > 0)
     {
         char receivedChar = Serial.read();
 
+        // Zeilenumbruch -> commando parsen und ausführen
         if (receivedChar == '\n')
         {
             inputBuffer[inputIndex] = '\0';
             inputIndex = 0;
-            parseCommand();
+            
+            Serial.println();
+            if (parseCommand())
+            {
+                doCommand();
+            }
+            else
+            {
+                Serial.println("Unbekannter Befehl");
+                prompt();
+            }
         }
-        else
+        else // weitere zeichen einlesen
         {
             Serial.print(receivedChar);
             inputBuffer[inputIndex] = receivedChar;
             inputIndex++;
+            
             if (inputIndex >= MAX_INPUT_LENGTH)
             {
                 inputIndex = 0;
             }
-        }   
+        }
     }
 }
 
-void zShell::parseCommand()
+bool zShell::parseCommand()
 {
     String inputString(inputBuffer); // Zeichenkette aus dem Puffer erstellen
     int spaceIndex = inputString.indexOf(' ');
@@ -84,34 +95,31 @@ void zShell::parseCommand()
             }
             argc++;
         }
-
-        doCommand();
     }
     else
     {
-        // Nur Befehl, keine Argumente
         command = inputString;
-        doCommand();
     }
+
+    // existiert das Kommando in der Map
+    command.trim();
+    if (commandMap.find(command) != commandMap.end())
+    {
+        return true;
+    }
+    return false;
 }
 
-void zShell::doCommand() 
+// commando ausführen
+void zShell::doCommand()
 {
-    Serial.println();
-    command.trim();
-    
-    if (commandMap.find(command) != commandMap.end()) {
-        // Führen Sie die Befehlsfunktion mit Standardargumenten aus
-        commandMap[command](0, nullptr);
-    }
-    else {
-        Serial.println("Unbekannter Befehl");
-    }
+    commandMap[command](0, nullptr);
     prompt();
 }
 
 
-   // Methode zum Hinzufügen eines Befehls zur commandMap
-    void zShell::addCommand(const String& cmd, fptr function) {
-        commandMap[cmd] = function;
-    }
+// Methode zum Hinzufügen eines Befehls zur commandMap
+void zShell::addCommand(const String &cmd, fptr function)
+{
+    commandMap[cmd] = function;
+}

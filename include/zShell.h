@@ -25,7 +25,7 @@ class zShell
     public:
         zShell();
         void init();
-        void parseCommand();
+        bool parseCommand();
         void doCommand();
         void handleSerialInput();
         void addCommand(const String& cmd, fptr function); 
