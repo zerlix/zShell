@@ -23,11 +23,13 @@ void sysinfo(int argc, char *argv)
      Serial.printf("Chip model   :\t %s Rev %d\n", ESP.getChipModel(), ESP.getChipRevision());
      Serial.printf("Anzahl Kerne :\t %d \n", ESP.getChipCores());
      Serial.printf("Chip ID      :\t %d \n", chipId);
-     Serial.printf("CPU Freq.    :\t %d \n Mhz", ESP.getCpuFreqMHz());
-     Serial.printf("Max  DRAM    :\t %d \n Byte", ESP.getHeapSize());
-     Serial.printf("Free DRAM    :\t %d \n Byte", ESP.getFreeHeap());
-     Serial.printf("Max  PSRAM   :\t %d \n Byte", ESP.getPsramSize());
-     Serial.printf("Free PSRAM   :\t %d \n Byte", ESP.getFreePsram());
+     Serial.printf("CPU Freq.    :\t %d Mhz\n", ESP.getCpuFreqMHz());
+     Serial.printf("Max  DRAM    :\t %d Byte\n", ESP.getHeapSize());
+     Serial.printf("Free DRAM    :\t %d Byte\n", ESP.getFreeHeap());
+     Serial.printf("Max  PSRAM   :\t %d Byte\n", ESP.getPsramSize());
+     Serial.printf("Free PSRAM   :\t %d Byte\n", ESP.getFreePsram());
+     Serial.printf("Flash Size   :\t %d Byte\n", ESP.getFlashChipSize());
+
 }
 
 #endif

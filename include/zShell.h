@@ -7,7 +7,6 @@
 #define MAX_ARGUMENTS_LENGTH 12
 
 typedef void (*fptr)(int argc, char *argv);
-extern std::map<String, fptr> commandMap;
 
 class zShell
 {
@@ -15,6 +14,10 @@ class zShell
         char inputBuffer[MAX_INPUT_LENGTH];
         String command;
         String arguments[MAX_ARGUMENTS_LENGTH];
+        String ErrorMsg;
+        
+        std::map<String, fptr> commandMap;
+
         int inputIndex = 0;
         
         inline void prompt(){Serial.print("zDisplay:~# "); }
@@ -25,6 +28,7 @@ class zShell
         void parseCommand();
         void doCommand();
         void handleSerialInput();
+        void addCommand(const String& cmd, fptr function); 
         
 };
 #endif

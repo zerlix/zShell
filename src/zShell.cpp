@@ -3,7 +3,7 @@
 #include <zShellCommands.h>
 #include <map>
 
-std::map<String, fptr> commandMap;
+//std::map<String, fptr> commandMap;
 
 zShell::zShell()
 {
@@ -109,3 +109,9 @@ void zShell::doCommand()
     }
     prompt();
 }
+
+
+   // Methode zum Hinzufügen eines Befehls zur commandMap
+    void zShell::addCommand(const String& cmd, fptr function) {
+        commandMap[cmd] = function;
+    }
