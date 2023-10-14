@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <zShell.h>
-#include <map>
 
 zShell shell;
 
