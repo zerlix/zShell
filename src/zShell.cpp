@@ -3,74 +3,96 @@
 #include <zShellCommands.h>
 #include <map>
 
-
+// Konstruktor
 zShell::zShell()
 {
-    command = ""; 
-    for (int i = 0; i < MAX_ARGUMENTS_LENGTH; i++)
-    {
-        arguments[i] = "";
-    }
+    command = "";
     init();
     return;
 }
 
+
+// Initialisierungsmethode
 void zShell::init()
 {
     commandMap["free"] = &free;
     commandMap["sysinfo"] = &sysinfo;
 
-    Serial.write(27);
-    Serial.print("[2J");
-
-    Serial.write(27);
-    Serial.print("[H");
-
+    setupSerial();
     prompt();
     return;
 }
 
+
+// Serielle Konfiguration
+void zShell::setupSerial()
+{
+    Serial.write(27);
+    Serial.print("[2J"); // clear console
+
+    Serial.write(27);
+    Serial.print("[H"); // Set cursor 
+}
+
+
+
+// Behandlung der seriellen Eingabe
 void zShell::handleSerialInput()
 {
-    // falls Serielle eingabe vorhanden, lesen
     if (Serial.available() > 0)
     {
         char receivedChar = Serial.read();
-
-        // Zeilenumbruch -> commando parsen und ausführen
         if (receivedChar == '\n')
         {
-            inputBuffer[inputIndex] = '\0';
-            inputIndex = 0;
-            
-            Serial.println();
-            if (parseCommand())
-            {
-                doCommand();
-            }
-            else
-            {
-                Serial.println("Unbekannter Befehl");
-                prompt();
-            }
+            processInput();
         }
-        else // weitere zeichen einlesen
+        else
         {
-            Serial.print(receivedChar);
-            inputBuffer[inputIndex] = receivedChar;
-            inputIndex++;
-            
-            if (inputIndex >= MAX_INPUT_LENGTH)
-            {
-                inputIndex = 0;
-            }
+            handleCharacter(receivedChar);
         }
     }
 }
 
+
+// Zeichenverarbeitung
+void zShell::handleCharacter(char receivedChar)
+{
+    Serial.print(receivedChar);
+    if (inputIndex >= MAX_INPUT_LENGTH)
+    {
+        inputIndex = 0;
+    }
+    inputBuffer[inputIndex] = receivedChar;
+    inputIndex++;
+}
+
+
+
+// Eingabe verarbeiten
+void zShell::processInput()
+{
+    inputBuffer[inputIndex] = '\0';
+    inputIndex = 0;
+
+    Serial.println();
+    if (parseCommand())
+    {
+        executeCommand();
+    }
+    else
+    {
+        Serial.println("Unbekannter Befehl");
+        prompt();
+    }
+}
+
+
+// Befehl parsen
 bool zShell::parseCommand()
 {
     String inputString(inputBuffer); // Zeichenkette aus dem Puffer erstellen
+    inputString.trim();              // Leerzeichen am Anfang und Ende entfernen
+
     int spaceIndex = inputString.indexOf(' ');
 
     if (spaceIndex >= 0)
@@ -78,21 +100,28 @@ bool zShell::parseCommand()
         // Befehl und Argumente aufteilen
         command = inputString.substring(0, spaceIndex);
         inputString = inputString.substring(spaceIndex + 1);
-        int argc = 0;
 
-        while (inputString.length() > 0 && argc < MAX_ARGUMENTS_LENGTH)
+        // Argumente in ein Array aufteilen
+        argc = 0;
+        while (!inputString.isEmpty() && argc < MAX_ARGUMENTS_LENGTH)
         {
             spaceIndex = inputString.indexOf(' ');
+
             if (spaceIndex >= 0)
             {
-                arguments[argc] = inputString.substring(0, spaceIndex);
+                String arg = inputString.substring(0, spaceIndex);
+                argv[argc] = new char[arg.length() + 1];
+                strcpy(argv[argc], arg.c_str());
                 inputString = inputString.substring(spaceIndex + 1);
             }
             else
             {
-                arguments[argc] = inputString;
+                String arg = inputString;
+                argv[argc] = new char[arg.length() + 1];
+                strcpy(argv[argc], arg.c_str());
                 inputString = "";
             }
+
             argc++;
         }
     }
@@ -101,7 +130,7 @@ bool zShell::parseCommand()
         command = inputString;
     }
 
-    // existiert das Kommando in der Map
+    // Existiert das Kommando in der Map?
     command.trim();
     if (commandMap.find(command) != commandMap.end())
     {
@@ -110,11 +139,23 @@ bool zShell::parseCommand()
     return false;
 }
 
-// commando ausführen
-void zShell::doCommand()
+
+// Befehl ausführen
+void zShell::executeCommand()
 {
-    commandMap[command](0, nullptr); 
-    inputIndex = 0; //Eingabepuffer leeren.
+    commandMap[command](argc, argv);
+
+    // Speicher freigeben
+    for (int i = 0; i < argc; i++)
+    {
+        if (argv[i] != nullptr)
+        {
+            delete[] argv[i];
+            argv[i] = nullptr;
+        }
+    }
+    inputIndex = 0; // Eingabepuffer leeren.
+
     prompt();
 }
 
@@ -124,3 +165,4 @@ void zShell::addCommand(const String &cmd, fptr function)
 {
     commandMap[cmd] = function;
 }
+

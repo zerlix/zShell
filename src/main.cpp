@@ -6,15 +6,20 @@ zShell shell;
 
 
 // Einfaches Beispiel für ein Kommando
-void myCommand(int argc, char *argv[])
+void cmd(int argc, char *argv[])
 {
- 
-  /*
-  if( argc > 0 ) {
+    Serial.println(argc);
 
-  }
-  */
-  Serial.println("Mein Commando");
+    if (argc > 0)
+    {
+        Serial.println("Hallo: " + String(argv[0]));
+    }
+    else
+    {
+        Serial.println("Mein Commando");
+    }
+
+    
 }
 
 
@@ -22,7 +27,7 @@ void setup()
 {
   Serial.begin(115200);
   shell.init(); // SHell initialisieren
-  shell.addCommand("myCommand", &myCommand); // eigenes Kommando der "commandoMap" hinzufügrn
+  shell.addCommand("cmd", &cmd); // eigenes Kommando der "commandoMap" hinzufügrn
 }
 
 
