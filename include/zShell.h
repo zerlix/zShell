@@ -6,7 +6,7 @@
 #define MAX_INPUT_LENGTH  64
 #define MAX_ARGUMENTS_LENGTH 12
 
-typedef void (*fptr)(int argc, char *argv);
+typedef void (*fptr)(int argc, char *argv[]);
 
 class zShell
 {

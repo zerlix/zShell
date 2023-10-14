@@ -2,7 +2,7 @@
 #define ZSHELLCOMMANDS
 #include <Arduino.h>
 
-void free(int argc, char *argv)
+void free(int argc, char *argv[])
 {
      Serial.println("Free memory: " + String(esp_get_free_heap_size()) + " bytes");
 }
@@ -10,7 +10,7 @@ void free(int argc, char *argv)
 /**
  * @brief: gibt systeminformationen aus
  **/
-void sysinfo(int argc, char *argv)
+void sysinfo(int argc, char *argv[])
 {
      
 

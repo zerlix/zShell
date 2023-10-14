@@ -6,7 +6,7 @@
 
 zShell::zShell()
 {
-    command = ""; // Anstatt NULL einen leeren String verwenden
+    command = ""; 
     for (int i = 0; i < MAX_ARGUMENTS_LENGTH; i++)
     {
         arguments[i] = "";
@@ -113,7 +113,8 @@ bool zShell::parseCommand()
 // commando ausführen
 void zShell::doCommand()
 {
-    commandMap[command](0, nullptr);
+    commandMap[command](0, nullptr); 
+    inputIndex = 0; //Eingabepuffer leeren.
     prompt();
 }
 
