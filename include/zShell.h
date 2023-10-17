@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <map>
 
+
 #define MAX_INPUT_LENGTH  64
 #define MAX_ARGUMENTS_LENGTH 12
 
@@ -33,6 +34,6 @@ public:
     bool parseCommand();
     void executeCommand();
     void addCommand(const String& cmd, fptr function);
+    void listCommands();
 };
-
 #endif

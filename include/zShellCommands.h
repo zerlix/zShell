@@ -1,21 +1,36 @@
 #ifndef ZSHELLCOMMANDS
 #define ZSHELLCOMMANDS
-#include <Arduino.h>
 
+#include <Arduino.h>
+#include <zShell.h>
+
+extern zShell shell;
+
+
+/**
+ * @brief gibt den freien speicher(heap) aus
+ * @todo: funktioniert nur mit esp32
+ **/ 
 void free(int argc, char *argv[])
 {
      Serial.println("Free memory: " + String(esp_get_free_heap_size()) + " bytes");
 }
 
 
+
+/**
+ * @todo reboot funktion 
+ **/
 void reboot(int argc, char *argv[])
 {
      
 }
 
 
+
 /**
  * @brief: gibt systeminformationen aus
+ * @todo: funktioniert nur mit esp32
  **/
 void sysinfo(int argc, char *argv[])
 {
@@ -40,5 +55,13 @@ void sysinfo(int argc, char *argv[])
 }
 
 
+/*
+ * @TODO: Print Comand Map
+ */
+void help(int argc, char *argv[])
+{
+     shell.listCommands();
+     Serial.println();
+}
 
 #endif

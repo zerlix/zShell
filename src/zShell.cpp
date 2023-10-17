@@ -1,7 +1,5 @@
-#include <Arduino.h>
 #include <zShell.h>
-#include <zShellCommands.h>
-#include <map>
+#include <zShellCommands.h> // Buildin Commands
 
 // Konstruktor
 zShell::zShell()
@@ -15,8 +13,10 @@ zShell::zShell()
 // Initialisierungsmethode
 void zShell::init()
 {
-    commandMap["free"] = &free;
-    commandMap["sysinfo"] = &sysinfo;
+    addCommand("free", &free); 
+    addCommand("reboot", &reboot); 
+    addCommand("sysinfo", &sysinfo); 
+    addCommand("help", &help);
 
     setupSerial();
     prompt();
@@ -82,6 +82,8 @@ void zShell::processInput()
     else
     {
         Serial.println("Unbekannter Befehl");
+        Serial.print("Verfügbare Kommandos: ");
+        help(0,nullptr);
         prompt();
     }
 }
@@ -164,5 +166,14 @@ void zShell::executeCommand()
 void zShell::addCommand(const String &cmd, fptr function)
 {
     commandMap[cmd] = function;
+}
+
+void zShell::listCommands()
+{
+    for (const auto &entry : commandMap)
+    {
+        Serial.print(entry.first);  // Befehlsname
+        Serial.print(", ");
+     }
 }
 
