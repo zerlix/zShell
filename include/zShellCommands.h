@@ -60,7 +60,7 @@ void sysinfo(int argc, char *argv[])
  */
 void help(int argc, char *argv[])
 {
-     shell.listCommands();
+     Shell.listCommands();
      Serial.println();
 }
 
