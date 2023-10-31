@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <zShell.h>
 
-extern zShell shell;
+zShell Shell;
 
 
 /**
